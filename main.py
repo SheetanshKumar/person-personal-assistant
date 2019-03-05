@@ -1,28 +1,38 @@
-import speech_recognition as sr #importing speech recognitionn package from google api
-from pygame import mixer
+import speech_recognition as sr  # importing speech recognition package from google api
+# from pygame import mixer
 import playsound    # to play saved mp3 file
 from gtts import gTTS   # google text to speech
 import os   # to save/open files
 import wolframalpha # to calculate strings into formula, its a website which provides api, 100 times per day
 from selenium import webdriver  # to control browser operations
 from selenium.webdriver.common.keys import Keys
+from io import BytesIO
+from io import StringIO
 
 num = 1
+
+
 def assistant_speaks(output):
     global num
     num +=1
-    print("PerSon : ",output)
-    toSpeak = gTTS(text=output, lang='en', slow=False)
-    file = "D:\PeRSon\\audio\spoken"+ str(num)+".mp3"
+    print("PerSon : ", output)
+    toSpeak = gTTS(text=output, lang='en-US', slow=False)
+    file = str(num)+".mp3"
     toSpeak.save(file)
-    #os.system("D:\PeRSon\\audio\spoken.mp3")
+    # mp3_fp = BytesIO()
+    # toSpeak = gTTS(output, 'en', slow=False)
+    # toSpeak.write_to_fp(mp3_fp)
+    # os.system("D:\PeRSon\\audio\spoken.mp3")
     '''mixer.init()
     mixer.music.load('D:\PeRSon\\audio\spoken.mp3')
     mixer.music.play()
     time.sleep(5)
     mixer.music.stop()'''
+    # song = AudioSegment.from_file(mp3_fp, format="mp3")
+    # playsound.playsound(mp3_fp)
     playsound.playsound(file, True)
     os.remove(file)
+
 
 def get_audio():
     r = sr.Recognizer()
@@ -38,6 +48,7 @@ def get_audio():
     except:
         assistant_speaks("Could not understand your audio, PLease try again!")
         return 0
+
 
 def search_web(input):
     driver = webdriver.Firefox()
@@ -57,17 +68,18 @@ def search_web(input):
         driver.get("https://en.wikipedia.org/wiki/" + '_'.join(query))
         return
     else:
-        driver.get("http://www.google.com")
-        search_box = driver.find_element_by_id("lst-ib")
-        search_box.clear()
         if 'google' in input:
             indx = input.lower().split().index('google')
             query = input.split()[indx + 1:]
-            search_box.send_keys(' '.join(query))
+            driver.get("https://www.google.com/search?q=" + '+'.join(query))
+        elif 'search' in input:
+            indx = input.lower().split().index('google')
+            query = input.split()[indx + 1:]
+            driver.get("https://www.google.com/search?q=" + '+'.join(query))
         else:
-            search_box.send_keys(input)
-        search_box.submit()
+            driver.get("https://www.google.com/search?q=" + '+'.join(input.split()))
         return
+
 
 def open_application(input):
     if "chrome" in input:
@@ -89,12 +101,14 @@ def open_application(input):
     else:
         assistant_speaks("Application not available")
         return
+
+
 def process_text(input):
     try:
         if "who are you" in input or "define yourself" in input:
             speak = '''Hello, I am Person. Your personal Assistant.
-            I am here to make your life easier. You can command me to perform
-            various tasks such as calculating sums or opening applications etcetra'''
+            I am here to make your life easier. 
+            You can command me to perform various tasks such as calculating sums or opening applications etcetra'''
             assistant_speaks(speak)
             return
         elif "who made you" in input or "created you" in input:
@@ -119,7 +133,7 @@ def process_text(input):
             open_application(input.lower())
             return
         elif 'search' in input or 'play' in input:
-            search_web(input)
+            search_web(input.lower())
             return
         else:
             assistant_speaks("I can search the web for you, Do you want to continue?")
@@ -128,7 +142,8 @@ def process_text(input):
                 search_web(input)
             else:
                 return
-    except :
+    except Exception as e:
+        print(e)
         assistant_speaks("I don't understand, I can search the web for you, Do you want to continue?")
         ans = get_audio()
         if 'yes' in str(ans) or 'yeah' in str(ans):
