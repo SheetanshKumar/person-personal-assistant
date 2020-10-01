@@ -1,7 +1,7 @@
 import speech_recognition as sr  # importing speech recognition package from google api
 # from pygame import mixer
 import playsound    # to play saved mp3 file
-from gtts import gTTS   # google text to speech
+from gtts import gTTS #import pyttsx3  # google text to speech
 import os   # to save/open files
 import wolframalpha # to calculate strings into formula, its a website which provides api, 100 times per day
 from selenium import webdriver  # to control browser operations
@@ -10,7 +10,12 @@ from io import BytesIO
 from io import StringIO
 
 num = 1
-
+'''
+def speak (usertext):
+    engine = pyttsx3.init()
+    engine.say(usertext)
+    engine.runAndWait()
+'''
 
 def assistant_speaks(output):
     global num
