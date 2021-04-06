@@ -1,3 +1,6 @@
+__author__ = "sheetansh"
+# Year : 2018
+
 import speech_recognition as sr  # importing speech recognition package from google api
 # from pygame import mixer
 import playsound    # to play saved mp3 file
